@@ -14,7 +14,7 @@ void mostrar_nombres(FILE *file) {
     while (fgets(line, MAX_LINE_LENGTH, file)) {
         char *tokens[12];
         int i = 0, inside_quotes = 0;
-        char *token = strtok(line, ",");
+        char *token = strtok(line, ";");
 
         while (token != NULL && i < 12) {
             if (inside_quotes) {
@@ -49,11 +49,11 @@ void calcular_promedio(FILE *file) {
     while (fgets(line, MAX_LINE_LENGTH, file)) {
         char *tokens[12];
         int i = 0, inside_quotes = 0;
-        char *token = strtok(line, ",");
+        char *token = strtok(line, ";");
 
         while (token != NULL && i < 12) {
             if (inside_quotes) {
-                strcat(tokens[i - 1], ",");
+                strcat(tokens[i - 1], ";");
                 strcat(tokens[i - 1], token);
                 if (token[strlen(token) - 1] == '"') {
                     inside_quotes = 0;
@@ -86,11 +86,11 @@ typedef void (*funcion_t)(FILE*);
 
 int main(int argc, char *argv[]) {
     if (argc < 2) {
-        printf("Uso: ./leer_pizzas [nombre_pizzas] [promedio_pizzas]\n");
+        printf("Uso: ./leer_pizzas_punteros.exe [nombre_pizzas] [promedio_pizzas]\n");
         return 1;
     }
 
-    FILE *file = fopen("pizzas_orders.csv", "r");
+    FILE *file = fopen("pizza.csv", "r");
     if (file == NULL) {
         perror("No se pudo abrir el archivo");
         return 1;
