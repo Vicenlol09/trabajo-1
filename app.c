@@ -85,12 +85,12 @@ void calcular_promedio(FILE *file) {
 typedef void (*funcion_t)(FILE*);
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        printf("Uso: ./leer_pizzas_punteros.exe [nombre_pizzas] [promedio_pizzas]\n");
+    if (argc < 3) {
+        printf("Uso: ./app [nombre del archivo csv] [funciones]\n");
         return 1;
     }
 
-    FILE *file = fopen("pizza.csv", "r");
+    FILE *file = fopen(argv[1], "r");
     if (file == NULL) {
         perror("No se pudo abrir el archivo");
         return 1;
@@ -101,7 +101,7 @@ int main(int argc, char *argv[]) {
     char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas"};
 
     // Recorrer los argumentos y llamar a las funciones dinámicamente
-    for (int i = 1; i < argc; i++) {
+    for (int i = 2; i < argc; i++) {
         for (int j = 0; j < 2; j++) {
             if (strcmp(argv[i], funciones_nombre[j]) == 0) {
                 funciones[j](file);  // Llamada dinámica a la función usando puntero
