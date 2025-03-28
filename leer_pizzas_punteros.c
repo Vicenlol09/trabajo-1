@@ -18,7 +18,7 @@ void mostrar_nombres(FILE *file) {
 
         while (token != NULL && i < 12) {
             if (inside_quotes) {
-                strcat(tokens[i - 1], ",");
+                strcat(tokens[i - 1], ";");
                 strcat(tokens[i - 1], token);
                 if (token[strlen(token) - 1] == '"') {
                     inside_quotes = 0;
@@ -29,7 +29,7 @@ void mostrar_nombres(FILE *file) {
                     inside_quotes = 1;
                 }
             }
-            token = strtok(NULL, ",");
+            token = strtok(NULL, ";");
         }
 
         if (i >= 12) {
@@ -64,7 +64,7 @@ void calcular_promedio(FILE *file) {
                     inside_quotes = 1;
                 }
             }
-            token = strtok(NULL, ",");
+            token = strtok(NULL, ";");
         }
 
         if (i >= 12) {
