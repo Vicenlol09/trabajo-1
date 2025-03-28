@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <float.h>
 
 #define MAX_LINE_LENGTH 1024
 #define MAX_PIZZAS 100
@@ -130,7 +131,7 @@ void pms(FILE *file){
         if (cantidad_maximos == 1) {
             printf("La pizza con la mayor cantidad (%d) es:\n", max_cantidad);
         } else {
-            printf("La(s) pizza(s) con la mayor cantidad (%d) son:\n", max_cantidad);
+            printf("Las pizzas con la mayor cantidad (%d) son:\n", max_cantidad);
         }
         for (int i = 0; i < cantidad_maximos; i++) {
             printf("%s\n", nombres_maximos[i]);
@@ -190,7 +191,7 @@ void pls(FILE *file) {
         if (cantidad_minimos == 1) {
             printf("La pizza con la menor cantidad (%d) es:\n", min_cantidad);
         } else {
-            printf("La(s) pizza(s) con la menor cantidad (%d) son:\n", min_cantidad);
+            printf("Las pizzas con la menor cantidad (%d) son:\n", min_cantidad);
         }
         for (int i = 0; i < cantidad_minimos; i++) {
             printf("%s\n", nombres_minimos[i]);
@@ -202,9 +203,184 @@ void pls(FILE *file) {
     rewind(file); 
 }
 
+void dms(FILE *file) {
+    char line[MAX_LINE_LENGTH];
+    fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
 
+    // Usamos un arreglo de estructuras para guardar fechas y ventas totales
+    typedef struct {
+        char fecha[MAX_LINE_LENGTH];
+        float total_venta;
+    } VentaPorFecha;
 
+    VentaPorFecha ventas[MAX_PIZZAS];  // Arreglo para almacenar las fechas y sus ventas
+    int num_fechas = 0;  // Contador de fechas registradas
 
+    // Leemos todas las líneas del archivo
+    while (fgets(line, MAX_LINE_LENGTH, file)) {
+        char *tokens[12];
+        int i = 0, inside_quotes = 0;
+        char *token = strtok(line, ";");
+
+        // Procesamos cada línea
+        while (token != NULL && i < 12) {
+            if (inside_quotes) {
+                strcat(tokens[i - 1], ";");
+                strcat(tokens[i - 1], token);
+                if (token[strlen(token) - 1] == '"') {
+                    inside_quotes = 0;
+                }
+            } else {
+                tokens[i++] = token;
+                if (token[0] == '"' && token[strlen(token) - 1] != '"') {
+                    inside_quotes = 1;
+                }
+            }
+            token = strtok(NULL, ";");
+        }
+
+        if (i >= 12) {
+            char *fecha = tokens[4];  // Fecha en la columna 5
+            float total_venta = atof(tokens[7]);  // Precio total en la columna 8
+
+            // Buscamos si ya tenemos esa fecha registrada
+            int encontrado = 0;
+            for (int j = 0; j < num_fechas; j++) {
+                if (strcmp(ventas[j].fecha, fecha) == 0) {
+                    ventas[j].total_venta += total_venta;  // Sumamos el total de ventas
+                    encontrado = 1;
+                    break;
+                }
+            }
+
+            // Si la fecha no está registrada, la añadimos
+            if (!encontrado) {
+                strcpy(ventas[num_fechas].fecha, fecha);
+                ventas[num_fechas].total_venta = total_venta;
+                num_fechas++;
+            }
+        }
+    }
+
+    // Encontrar la mayor venta
+    float max_venta = 0;
+    for (int i = 0; i < num_fechas; i++) {
+        if (ventas[i].total_venta > max_venta) {
+            max_venta = ventas[i].total_venta;
+        }
+    }
+    // Contamos cuántas fechas tienen la venta máxima
+    int count_max = 0;
+    for (int i = 0; i < num_fechas; i++) {
+        if (ventas[i].total_venta == max_venta) {
+            count_max++;
+        }
+    }
+    if (count_max == 1) {
+        printf("La fecha con la mayor venta es:\n", max_venta);
+    } else {
+        printf("Las fechas con mayor venta son:\n", max_venta);
+    }
+
+    // Mostrar las fechas y ventas
+    for (int i = 0; i < num_fechas; i++) {
+        if (ventas[i].total_venta == max_venta) {
+            printf("Fecha: %s, Dinero recaudado: %.2f\n", ventas[i].fecha, ventas[i].total_venta);
+        }
+    }
+}
+
+void dls(FILE *file) {
+    char line[MAX_LINE_LENGTH];
+    fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
+
+    // Usamos un arreglo de estructuras para guardar fechas y ventas totales
+    typedef struct {
+        char fecha[MAX_LINE_LENGTH];
+        float total_venta;
+    } VentaPorFecha;
+
+    VentaPorFecha ventas[MAX_PIZZAS];  // Arreglo para almacenar las fechas y sus ventas
+    int num_fechas = 0;  // Contador de fechas registradas
+
+    // Leemos todas las líneas del archivo
+    while (fgets(line, MAX_LINE_LENGTH, file)) {
+        char *tokens[12];
+        int i = 0, inside_quotes = 0;
+        char *token = strtok(line, ";");
+
+        // Procesamos cada línea
+        while (token != NULL && i < 12) {
+            if (inside_quotes) {
+                strcat(tokens[i - 1], ";");
+                strcat(tokens[i - 1], token);
+                if (token[strlen(token) - 1] == '"') {
+                    inside_quotes = 0;
+                }
+            } else {
+                tokens[i++] = token;
+                if (token[0] == '"' && token[strlen(token) - 1] != '"') {
+                    inside_quotes = 1;
+                }
+            }
+            token = strtok(NULL, ";");
+        }
+
+        if (i >= 12) {
+            char *fecha = tokens[4];  // Fecha en la columna 5
+            float total_venta = atof(tokens[7]);  // Precio total en la columna 8
+
+            // Buscamos si ya tenemos esa fecha registrada
+            int encontrado = 0;
+            for (int j = 0; j < num_fechas; j++) {
+                if (strcmp(ventas[j].fecha, fecha) == 0) {
+                    ventas[j].total_venta += total_venta;  // Sumamos el total de ventas
+                    encontrado = 1;
+                    break;
+                }
+            }
+
+            // Si la fecha no está registrada, la añadimos
+            if (!encontrado) {
+                strcpy(ventas[num_fechas].fecha, fecha);
+                ventas[num_fechas].total_venta = total_venta;
+                num_fechas++;
+            }
+        }
+    }
+
+    // Encontrar la menor venta
+    float min_venta = FLT_MAX;  // Usamos el valor máximo de un float como referencia
+    for (int i = 0; i < num_fechas; i++) {
+        if (ventas[i].total_venta < min_venta) {
+            min_venta = ventas[i].total_venta;
+        }
+    }
+
+    // Contamos cuántas fechas tienen la venta mínima
+    int count_min = 0;
+    for (int i = 0; i < num_fechas; i++) {
+        if (ventas[i].total_venta == min_venta) {
+            count_min++;
+        }
+    }
+
+    // Imprimir las fechas con la menor venta
+    if (count_min == 1) {
+        printf("La fecha con la menor venta es:\n");
+    } else {
+        printf("Las fechas con menor venta son:\n");
+    }
+
+    // Mostrar las fechas y ventas
+    for (int i = 0; i < num_fechas; i++) {
+        if (ventas[i].total_venta == min_venta) {
+            printf("Fecha: %s, Ventas Totales: %.2f\n", ventas[i].fecha, ventas[i].total_venta);
+        }
+    }
+
+    rewind(file);  // Volver al inicio para otra función
+}
 
 
 
@@ -224,12 +400,12 @@ int main(int argc, char *argv[]) {
     }
 
     // Definir un arreglo de punteros a funciones
-    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls};
-    char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls"};
+    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls, dms, dls};
+    char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls", "dms", "dls"};
 
     // Recorrer los argumentos y llamar a las funciones dinámicamente
     for (int i = 2; i < argc; i++) {
-        for (int j = 0; j < 4; j++) {
+        for (int j = 0; j < 6; j++) {
             if (strcmp(argv[i], funciones_nombre[j]) == 0) {
                 funciones[j](file);  // Llamada dinámica a la función usando puntero
                 break;
