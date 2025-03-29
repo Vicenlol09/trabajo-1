@@ -508,6 +508,53 @@ void dlsp(FILE *file) {
     rewind(file);
 }
 
+void hp(FILE *file) {
+    char line[MAX_LINE_LENGTH];
+    fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
+    
+    int classic_count = 0, veggie_count = 0;
+    
+    while (fgets(line, MAX_LINE_LENGTH, file)) {
+        char *tokens[12];
+        int i = 0, inside_quotes = 0;
+        char *token = strtok(line, ";");
+
+        while (token != NULL && i < 12) {
+            if (inside_quotes) {
+                strcat(tokens[i - 1], ";");
+                strcat(tokens[i - 1], token);
+                if (token[strlen(token) - 1] == '"') {
+                    inside_quotes = 0;
+                }
+            } else {
+                tokens[i++] = token;
+                if (token[0] == '"' && token[strlen(token) - 1] != '"') {
+                    inside_quotes = 1;
+                }
+            }
+            token = strtok(NULL, ";");
+        }
+
+        if (i >= 12) {
+            int quantity = atoi(tokens[3]);  // Token 4 (índice 3 en array)
+            char *categoria = tokens[8];     // Token 9 (índice 8 en array)
+
+            if (strcmp(categoria, "Classic") == 0) {
+                classic_count += quantity;
+            }
+
+            else if (strcmp(categoria, "Veggie") == 0) {
+                veggie_count += quantity;
+            }
+        }
+    }
+    printf("Cantidad de pizzas vendidas por categoría:\n");
+    printf("Classic: %d\n", classic_count);
+    printf("Veggie: %d\n", veggie_count);
+    
+    rewind(file);  // Volver al inicio para otra función
+}
+
 // Definimos un tipo de puntero a función que toma un FILE* como parámetro
 typedef void (*funcion_t)(FILE*);
 
@@ -524,12 +571,12 @@ int main(int argc, char *argv[]) {
     }
 
     // Definir un arreglo de punteros a funciones
-    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls, dms, dls, dmsp, dlsp};
-    char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls", "dms", "dls", "dmsp", "dlsp"};
+    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls, dms, dls, dmsp, dlsp, hp}; //hp es la decima
+    char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls", "dms", "dls", "dmsp", "dlsp", "hp"}; //hp es la decima
 
     // Recorrer los argumentos y llamar a las funciones dinámicamente
     for (int i = 2; i < argc; i++) {
-        for (int j = 0; j < 8; j++) {
+        for (int j = 0; j < 9; j++) {
             if (strcmp(argv[i], funciones_nombre[j]) == 0) {
                 funciones[j](file);  // Llamada dinámica a la función usando puntero
                 break;
