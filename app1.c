@@ -375,7 +375,7 @@ void dls(FILE *file) {
     // Mostrar las fechas y ventas
     for (int i = 0; i < num_fechas; i++) {
         if (ventas[i].total_venta == min_venta) {
-            printf("Fecha: %s, Ventas Totales: %.2f\n", ventas[i].fecha, ventas[i].total_venta);
+            printf("Fecha: %s, Dinero recaudado: %.2f\n", ventas[i].fecha, ventas[i].total_venta);
         }
     }
 
