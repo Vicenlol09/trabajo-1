@@ -382,7 +382,131 @@ void dls(FILE *file) {
     rewind(file);  // Volver al inicio para otra función
 }
 
+#define MAX_DATES 100
+void dmsp(FILE *file) {
+    char line[MAX_LINE_LENGTH];
+    fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezado
 
+    typedef struct {
+        char fecha[20];  // Fecha (formato DD-MM-YYYY)
+        int total_vendido;  // Total de pizzas vendidas en esa fecha
+    } Venta;
+
+    Venta ventas[MAX_DATES];  
+    int num_fechas = 0;
+
+    // Leer las líneas y procesar las fechas y cantidades
+    while (fgets(line, MAX_LINE_LENGTH, file)) {
+        char *tokens[12];
+        int i = 0;
+        char *token = strtok(line, ";");
+
+        while (token != NULL && i < 12) {
+            tokens[i++] = token;
+            token = strtok(NULL, ";");
+        }
+
+        if (i >= 12) {
+            char *fecha = tokens[4];  // Fecha en formato DD-MM-YYYY
+            int cantidad = atoi(tokens[3]);  // La cantidad de pizzas vendidas
+
+            // Comprobar si la fecha ya existe en el arreglo de ventas
+            int found = 0;
+            for (int j = 0; j < num_fechas; j++) {
+                if (strcmp(ventas[j].fecha, fecha) == 0) {
+                    ventas[j].total_vendido += cantidad;  // Acumular cantidad de ventas
+                    found = 1;
+                    break;
+                }
+            }
+
+            // Si la fecha no existe, agregarla al arreglo
+            if (!found && num_fechas < MAX_DATES) {
+                strcpy(ventas[num_fechas].fecha, fecha);
+                ventas[num_fechas].total_vendido = cantidad;
+                num_fechas++;
+            }
+        }
+    }
+
+    // Buscar la fecha con más pizzas vendidas
+    int max_ventas = 0;
+    char mejor_fecha[20];
+
+    for (int i = 0; i < num_fechas; i++) {
+        if (ventas[i].total_vendido > max_ventas) {
+            max_ventas = ventas[i].total_vendido;
+            strcpy(mejor_fecha, ventas[i].fecha);
+        }
+    }
+
+    // Mostrar la fecha con más pizzas vendidas y la cantidad
+    printf("\nFecha con más pizzas vendidas: %s (%d pizzas)\n", mejor_fecha, max_ventas);
+    rewind(file);
+}
+
+#define MAX_DATES 100
+void dlsp(FILE *file) {
+    char line[MAX_LINE_LENGTH];
+    fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezado
+
+    typedef struct {
+        char fecha[20];  // Fecha (formato DD-MM-YYYY)
+        int total_vendido;  // Total de pizzas vendidas en esa fecha
+    } Venta;
+
+    Venta ventas[MAX_DATES];  
+    int num_fechas = 0;
+
+    // Leer las líneas y procesar las fechas y cantidades
+    while (fgets(line, MAX_LINE_LENGTH, file)) {
+        char *tokens[12];
+        int i = 0;
+        char *token = strtok(line, ";");
+
+        while (token != NULL && i < 12) {
+            tokens[i++] = token;
+            token = strtok(NULL, ";");
+        }
+
+        if (i >= 12) {
+            char *fecha = tokens[4];  // Fecha en formato DD-MM-YYYY
+            int cantidad = atoi(tokens[3]);  // La cantidad de pizzas vendidas
+
+            // Comprobar si la fecha ya existe en el arreglo de ventas
+            int found = 0;
+            for (int j = 0; j < num_fechas; j++) {
+                if (strcmp(ventas[j].fecha, fecha) == 0) {
+                    ventas[j].total_vendido += cantidad;  // Acumular cantidad de ventas
+                    found = 1;
+                    break;
+                }
+            }
+
+            // Si la fecha no existe, agregarla al arreglo
+            if (!found && num_fechas < MAX_DATES) {
+                strcpy(ventas[num_fechas].fecha, fecha);
+                ventas[num_fechas].total_vendido = cantidad;
+                num_fechas++;
+            }
+        }
+    }
+
+    // Buscar la fecha con menos pizzas vendidas
+    int min_ventas = __INT_MAX__;
+    char peor_fecha[20];
+
+    for (int i = 0; i < num_fechas; i++) {
+        if (ventas[i].total_vendido < min_ventas) {
+            min_ventas = ventas[i].total_vendido;
+            strcpy(peor_fecha, ventas[i].fecha);
+        }
+    }
+
+    // Mostrar la fecha con menos pizzas vendidas y la cantidad
+    printf("\nFecha con menos pizzas vendidas: %s (%d pizzas)\n", peor_fecha, min_ventas);
+    rewind(file);
+}
 
 // Definimos un tipo de puntero a función que toma un FILE* como parámetro
 typedef void (*funcion_t)(FILE*);
@@ -400,12 +524,12 @@ int main(int argc, char *argv[]) {
     }
 
     // Definir un arreglo de punteros a funciones
-    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls, dms, dls};
-    char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls", "dms", "dls"};
+    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls, dms, dls, dmsp, dlsp};
+    char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls", "dms", "dls", "dmsp", "dlsp"};
 
     // Recorrer los argumentos y llamar a las funciones dinámicamente
     for (int i = 2; i < argc; i++) {
-        for (int j = 0; j < 6; j++) {
+        for (int j = 0; j < 8; j++) {
             if (strcmp(argv[i], funciones_nombre[j]) == 0) {
                 funciones[j](file);  // Llamada dinámica a la función usando puntero
                 break;
