@@ -441,7 +441,7 @@ void dmsp(FILE *file) {
     }
 
     // Mostrar la fecha con más pizzas vendidas y la cantidad
-    printf("\nFecha con más pizzas vendidas: %s (%d pizzas)\n", mejor_fecha, max_ventas);
+    printf("\nFecha con mayor cantidad de pizzas vendidas: %s (%d pizzas)\n", mejor_fecha, max_ventas);
     rewind(file);
 }
 
@@ -504,7 +504,7 @@ void dlsp(FILE *file) {
     }
 
     // Mostrar la fecha con menos pizzas vendidas y la cantidad
-    printf("\nFecha con menos pizzas vendidas: %s (%d pizzas)\n", peor_fecha, min_ventas);
+    printf("\nFecha con menor cantidad de pizzas vendidas: %s (%d pizzas)\n", peor_fecha, min_ventas);
     rewind(file);
 }
 
@@ -537,7 +537,7 @@ void hp(FILE *file) {
 
         if (i >= 12) {
             int quantity = atoi(tokens[3]);  // Token 4 (índice 3 en array)
-            char *categoria = tokens[8];     // Token 9 (índice 8 en array)
+            char *categoria = tokens[9];     // Token 9 (índice 8 en array)
 
             if (strcmp(categoria, "Classic") == 0) {
                 classic_count += quantity;
@@ -548,7 +548,7 @@ void hp(FILE *file) {
             }
         }
     }
-    printf("Cantidad de pizzas vendidas por categoría:\n");
+    printf("Cantidad de pizzas vendidas por categoria:\n");
     printf("Classic: %d\n", classic_count);
     printf("Veggie: %d\n", veggie_count);
     
@@ -576,7 +576,7 @@ int main(int argc, char *argv[]) {
 
     // Recorrer los argumentos y llamar a las funciones dinámicamente
     for (int i = 2; i < argc; i++) {
-        for (int j = 0; j < 9; j++) {
+        for (int j = 0; j < 10; j++) {
             if (strcmp(argv[i], funciones_nombre[j]) == 0) {
                 funciones[j](file);  // Llamada dinámica a la función usando puntero
                 break;
