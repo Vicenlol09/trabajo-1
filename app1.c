@@ -642,6 +642,122 @@ void apd(FILE *file) {
     rewind(file);
 }
 
+#define MAX_INGREDIENTS 100
+typedef struct {
+    char ingredient[50];
+    int count;
+} IngredientCount;
+
+void ims(FILE *file) {
+    char line[MAX_LINE_LENGTH];
+    fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
+    
+    IngredientCount ingredients[MAX_INGREDIENTS];
+    int ingredient_count = 0;
+    
+    while (fgets(line, MAX_LINE_LENGTH, file)) {
+        char *ptr = line;
+        char *tokens[12];
+        int token_count = 0;
+        int in_quotes = 0;
+        char *start = ptr;
+
+        while (*ptr && token_count < 12) {
+            if (*ptr == '"') {
+                in_quotes = !in_quotes;
+            } else if (*ptr == ';' && !in_quotes) {
+                *ptr = '\0';
+                tokens[token_count++] = start;
+                start = ptr + 1;
+            }
+            ptr++;
+        }
+        if (token_count < 12) {
+            tokens[token_count++] = start;
+        }
+
+        if (token_count >= 11) {
+            int quantity = atoi(tokens[3]);
+            char *ingredients_token = tokens[10];
+            
+            // Limpiar comillas si existen
+            if (ingredients_token[0] == '"') {
+                ingredients_token++;
+                size_t len = strlen(ingredients_token);
+                if (len > 0 && ingredients_token[len-1] == '"') {
+                    ingredients_token[len-1] = '\0';
+                }
+            }
+            
+            // Procesar ingredientes
+            char *saveptr;
+            char *ingredient = strtok_r(ingredients_token, ";", &saveptr);
+            
+            while (ingredient != NULL) {
+                // Limpiar espacios
+                while (*ingredient == ' ') ingredient++;
+                size_t len = strlen(ingredient);
+                while (len > 0 && ingredient[len-1] == ' ') {
+                    ingredient[len-1] = '\0';
+                    len--;
+                }
+                
+                if (*ingredient == '\0') {
+                    ingredient = strtok_r(NULL, ";", &saveptr);
+                    continue;
+                }
+                
+                // Convertir a minúsculas
+                for (char *p = ingredient; *p; p++) {
+                    *p = tolower(*p);
+                }
+                
+                // Buscar o agregar ingrediente
+                int found = 0;
+                for (int j = 0; j < ingredient_count; j++) {
+                    if (strcmp(ingredients[j].ingredient, ingredient) == 0) {
+                        ingredients[j].count += quantity;
+                        found = 1;
+                        break;
+                    }
+                }
+                
+                if (!found && ingredient_count < MAX_INGREDIENTS) {
+                    strncpy(ingredients[ingredient_count].ingredient, ingredient, 49);
+                    ingredients[ingredient_count].ingredient[49] = '\0';
+                    ingredients[ingredient_count].count = quantity;
+                    ingredient_count++;
+                }
+                
+                ingredient = strtok_r(NULL, ";", &saveptr);
+            }
+        }
+    }
+
+    // Encontrar el ingrediente con mayor conteo
+    if (ingredient_count == 0) {
+        printf("No se encontraron ingredientes.\n");
+        rewind(file);
+        return;
+    }
+
+    int max_count = ingredients[0].count;
+    char max_ingredient[50];
+    strcpy(max_ingredient, ingredients[0].ingredient);
+
+    for (int j = 1; j < ingredient_count; j++) {
+        if (ingredients[j].count > max_count) {
+            max_count = ingredients[j].count;
+            strcpy(max_ingredient, ingredients[j].ingredient);
+        }
+    }
+
+    printf("El ingrediente mas vendido es: %s (aparece %d veces)\n", max_ingredient, max_count);
+    
+    rewind(file);
+}
+
+
 void hp(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
@@ -705,12 +821,12 @@ int main(int argc, char *argv[]) {
     }
 
     // Definir un arreglo de punteros a funciones
-    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls, dms, dls, dmsp, dlsp, apo, apd, hp}; //hp es la decima
-    char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls", "dms", "dls", "dmsp", "dlsp", "apo", "apd", "hp"}; //hp es la decima
+    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls, dms, dls, dmsp, dlsp, apo, apd, ims, hp}; 
+    char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls", "dms", "dls", "dmsp", "dlsp", "apo", "apd", "ims", "hp"}; 
 
     // Recorrer los argumentos y llamar a las funciones dinámicamente
     for (int i = 2; i < argc; i++) {
-        for (int j = 0; j < 10; j++) {
+        for (int j = 0; j < 12; j++) {
             if (strcmp(argv[i], funciones_nombre[j]) == 0) {
                 funciones[j](file);  // Llamada dinámica a la función usando puntero
                 break;
