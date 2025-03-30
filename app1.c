@@ -508,6 +508,140 @@ void dlsp(FILE *file) {
     rewind(file);
 }
 
+void apo(FILE *file) {
+    char line[MAX_LINE_LENGTH];
+    fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
+
+    int total_ordenes = 0;
+    int total_pizzas = 0;
+    int current_order = -1;
+    int pizzas_in_order = 0;
+
+    while (fgets(line, MAX_LINE_LENGTH, file)) {
+        char *tokens[12];
+        int i = 0, inside_quotes = 0;
+        char *token = strtok(line, ";");
+
+        // Procesamiento de tokens 
+        while (token != NULL && i < 12) {
+            if (inside_quotes) {
+                strcat(tokens[i - 1], ";");
+                strcat(tokens[i - 1], token);
+                if (token[strlen(token) - 1] == '"') {
+                    inside_quotes = 0;
+                }
+            } else {
+                tokens[i++] = token;
+                if (token[0] == '"' && token[strlen(token) - 1] != '"') {
+                    inside_quotes = 1;
+                }
+            }
+            token = strtok(NULL, ";");
+        }
+
+        if (i >= 12) {
+            int order_id = atoi(tokens[1]);  // Columna order_id
+            int quantity = atoi(tokens[3]);   // Columna quantity
+
+            if (order_id != current_order) {
+                // Nueva orden encontrada
+                if (current_order != -1) {
+                    total_ordenes++;
+                    total_pizzas += pizzas_in_order;
+                }
+                current_order = order_id;
+                pizzas_in_order = quantity;
+            } else {
+                // Misma orden, sumar cantidad
+                pizzas_in_order += quantity;
+            }
+        }
+    }
+
+    // Añadir la última orden
+    if (current_order != -1) {
+        total_ordenes++;
+        total_pizzas += pizzas_in_order;
+    }
+
+    // Calcular y mostrar el promedio
+    if (total_ordenes > 0) {
+        float promedio = (float)total_pizzas / total_ordenes;
+        printf("El promedio de pizzas por orden es: %.2f\n", promedio);
+    } else {
+        printf("No se encontraron ordenes en el archivo.\n");
+    }
+
+    rewind(file);
+}
+ 
+void apd(FILE *file) {
+    char line[MAX_LINE_LENGTH];
+    fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
+
+    int total_dias = 0;
+    int total_pizzas = 0;
+    char current_date[MAX_LINE_LENGTH] = "";
+    int pizzas_in_day = 0;
+
+    while (fgets(line, MAX_LINE_LENGTH, file)) {
+        char *tokens[12];
+        int i = 0, inside_quotes = 0;
+        char *token = strtok(line, ";");
+
+        // Procesamiento de tokens igual que en el código original
+        while (token != NULL && i < 12) {
+            if (inside_quotes) {
+                strcat(tokens[i - 1], ";");
+                strcat(tokens[i - 1], token);
+                if (token[strlen(token) - 1] == '"') {
+                    inside_quotes = 0;
+                }
+            } else {
+                tokens[i++] = token;
+                if (token[0] == '"' && token[strlen(token) - 1] != '"') {
+                    inside_quotes = 1;
+                }
+            }
+            token = strtok(NULL, ";");
+        }
+
+        if (i >= 12) {
+            char *order_date = tokens[4];  // Columna order_date
+            int quantity = atoi(tokens[3]); // Columna quantity
+
+            if (strcmp(order_date, current_date) != 0) {
+                // Nuevo día encontrado
+                if (strlen(current_date) > 0) {
+                    total_dias++;
+                    total_pizzas += pizzas_in_day;
+                }
+                strcpy(current_date, order_date);
+                pizzas_in_day = quantity;
+            } else {
+                // Mismo día, sumar cantidad
+                pizzas_in_day += quantity;
+            }
+        }
+    }
+
+    // Añadir el último día
+    if (strlen(current_date) > 0) {
+        total_dias++;
+        total_pizzas += pizzas_in_day;
+    }
+
+    // Calcular y mostrar el promedio
+    if (total_dias > 0) {
+        float promedio = (float)total_pizzas / total_dias;
+        printf("El promedio de pizzas por dia es: %.2f\n", promedio);
+    } else {
+        printf("No se encontraron datos de dias en el archivo.\n");
+    }
+
+    rewind(file);
+}
+
 void hp(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
@@ -571,8 +705,8 @@ int main(int argc, char *argv[]) {
     }
 
     // Definir un arreglo de punteros a funciones
-    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls, dms, dls, dmsp, dlsp, hp}; //hp es la decima
-    char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls", "dms", "dls", "dmsp", "dlsp", "hp"}; //hp es la decima
+    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls, dms, dls, dmsp, dlsp, apo, apd, hp}; //hp es la decima
+    char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls", "dms", "dls", "dmsp", "dlsp", "apo", "apd", "hp"}; //hp es la decima
 
     // Recorrer los argumentos y llamar a las funciones dinámicamente
     for (int i = 2; i < argc; i++) {
