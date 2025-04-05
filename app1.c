@@ -2,11 +2,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
+#include <ctype.h>
 
 #define MAX_LINE_LENGTH 1024
 #define MAX_PIZZAS 100
 // Definición de las funciones
-void mostrar_nombres(FILE *file) {
+void nombre_pizzas(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
 
@@ -40,7 +41,7 @@ void mostrar_nombres(FILE *file) {
     rewind(file);  // Volver al inicio para otra función
 }
 
-void calcular_promedio(FILE *file) {
+void promedio_pizzas(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
 
@@ -288,6 +289,7 @@ void dms(FILE *file) {
             printf("Fecha: %s, Dinero recaudado: %.2f\n", ventas[i].fecha, ventas[i].total_venta);
         }
     }
+    rewind(file);
 }
 
 void dls(FILE *file) {
@@ -347,6 +349,7 @@ void dls(FILE *file) {
                 num_fechas++;
             }
         }
+        
     }
 
     // Encontrar la menor venta
@@ -821,7 +824,7 @@ int main(int argc, char *argv[]) {
     }
 
     // Definir un arreglo de punteros a funciones
-    funcion_t funciones[] = {mostrar_nombres, calcular_promedio, pms, pls, dms, dls, dmsp, dlsp, apo, apd, ims, hp}; 
+    funcion_t funciones[] = {nombre_pizzas, promedio_pizzas, pms, pls, dms, dls, dmsp, dlsp, apo, apd, ims, hp}; 
     char *funciones_nombre[] = {"nombre_pizzas", "promedio_pizzas", "pms", "pls", "dms", "dls", "dmsp", "dlsp", "apo", "apd", "ims", "hp"}; 
 
     // Recorrer los argumentos y llamar a las funciones dinámicamente
