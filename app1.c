@@ -1,9 +1,11 @@
+//Se agregan librerías para usar comandos particulares
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <float.h>
 #include <ctype.h>
 
+//Definimos máximo de caracteres
 #define MAX_LINE_LENGTH 1024
 #define MAX_PIZZAS 100
 // Definición de las funciones
