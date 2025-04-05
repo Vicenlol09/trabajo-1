@@ -8,18 +8,19 @@
 //Definimos máximo de caracteres
 #define MAX_LINE_LENGTH 1024
 #define MAX_PIZZAS 100
-// Definición de las funciones
+
+// Funcion para obtener los nombres de las pizzas
 void nombre_pizzas(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
 
     printf("Nombres de las pizzas:\n");
-
+    // Leer cada línea del archivo
     while (fgets(line, MAX_LINE_LENGTH, file)) {
         char *tokens[12];
         int i = 0, inside_quotes = 0;
         char *token = strtok(line, ";");
-
+        // Procesar cada token
         while (token != NULL && i < 12) {
             if (inside_quotes) {
                 strcat(tokens[i - 1], ";");
@@ -42,7 +43,7 @@ void nombre_pizzas(FILE *file) {
     }
     rewind(file);  // Volver al inicio para otra función
 }
-
+// Función para calcular el promedio de precios de las pizzas
 void promedio_pizzas(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
@@ -85,7 +86,7 @@ void promedio_pizzas(FILE *file) {
     }
     rewind(file);  // Volver al inicio para otra función
 }
-
+// Función para encontrar la pizza con la mayor cantidad vendida
 void pms(FILE *file){
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
@@ -145,7 +146,7 @@ void pms(FILE *file){
 
     rewind(file);  // Volver al inicio para otra función
 }
-
+// Función para encontrar la pizza con la menor cantidad vendida
 void pls(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
@@ -205,7 +206,7 @@ void pls(FILE *file) {
 
     rewind(file); 
 }
-
+// Función para encontrar la fecha con la mayor venta
 void dms(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
@@ -293,7 +294,7 @@ void dms(FILE *file) {
     }
     rewind(file);
 }
-
+// Función para encontrar la fecha con la menor venta
 void dls(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
@@ -387,6 +388,7 @@ void dls(FILE *file) {
     rewind(file);  // Volver al inicio para otra función
 }
 
+// Función para encontrar la fecha con la mayor cantidad de pizzas vendidas
 #define MAX_DATES 100
 void dmsp(FILE *file) {
     char line[MAX_LINE_LENGTH];
@@ -449,7 +451,7 @@ void dmsp(FILE *file) {
     printf("\nFecha con mayor cantidad de pizzas vendidas: %s (%d pizzas)\n", mejor_fecha, max_ventas);
     rewind(file);
 }
-
+// Función para encontrar la fecha con la menor cantidad de pizzas vendidas
 #define MAX_DATES 100
 void dlsp(FILE *file) {
     char line[MAX_LINE_LENGTH];
@@ -512,7 +514,7 @@ void dlsp(FILE *file) {
     printf("\nFecha con menor cantidad de pizzas vendidas: %s (%d pizzas)\n", peor_fecha, min_ventas);
     rewind(file);
 }
-
+// Función para calcular el promedio de pizzas por orden
 void apo(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
@@ -579,7 +581,7 @@ void apo(FILE *file) {
 
     rewind(file);
 }
- 
+// Función para calcular el promedio de pizzas por día
 void apd(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
@@ -653,6 +655,7 @@ typedef struct {
     int count;
 } IngredientCount;
 
+// Función para encontrar el ingrediente más vendido
 void ims(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
@@ -762,7 +765,7 @@ void ims(FILE *file) {
     rewind(file);
 }
 
-
+// Función para contar la cantidad de pizzas vendidas por categoría
 void hp(FILE *file) {
     char line[MAX_LINE_LENGTH];
     fgets(line, MAX_LINE_LENGTH, file);  // Saltar encabezados
